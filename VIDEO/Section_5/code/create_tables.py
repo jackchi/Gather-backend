@@ -7,6 +7,6 @@ cursor = connection.cursor()
 create_table = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username test, password text)"
 cursor.execute(create_table)
 
-connection.commmit()
+connection.commit()
 
 connection.close()

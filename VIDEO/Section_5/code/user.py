@@ -1,5 +1,6 @@
 # allows py to interact w/ sqlite3
 import sqlite3
+from flask_restful import Resource, reqparse
 
 
 class User:
@@ -44,3 +45,39 @@ class User:
 
         connection.close()
         return user
+
+
+class UserRegister(Resource):
+
+    parser = reqparse.RequestParser()
+    # create required name/pw fields
+    parser.add_arguement('username',
+                         type=str,
+                         required=True,
+                         help="This field cannot be blank."
+                         )
+    parser.add_arguement('password',
+                         type=str,
+                         required=True,
+                         help="This field cannot be blank."
+                         )
+
+    def post(self):
+        # use the parser
+        data = UserRegister.parser.parse_args()
+
+        # connection to database
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        # insert values into table. 1st id must be NULL in order to auto-increment. "?"s == username argument, pw argument.
+        query = "INSERT INTO users VALUES (NULL, ?, ?)"
+        # username/pw must be in tuple
+        cursor.execute(query, (data['username'], data['password']))
+
+        # save to disk
+        connection.commit()
+        # close connection
+        connection.close()
+
+        return {"message": "User created successfully."}, 201

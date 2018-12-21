@@ -51,20 +51,18 @@ class UserRegister(Resource):
 
     parser = reqparse.RequestParser()
     # create required name/pw fields
-    parser.add_arguement('username',
-                         type=str,
-                         required=True,
-                         help="This field cannot be blank."
-                         )
-    parser.add_arguement('password',
-                         type=str,
-                         required=True,
-                         help="This field cannot be blank."
-                         )
+    parser.add_argument('username', type=str, required=True,
+                        help="This field cannot be blank.")
+    parser.add_argument('password', type=str, required=True,
+                        help="This field cannot be blank.")
 
     def post(self):
-        # use the parser
+        # use the parser / get data from JSON payload
         data = UserRegister.parser.parse_args()
+
+        # find by username
+        if User.find_by_username(data['username']):
+            return {"message": "A user with that username already exists"}, 400
 
         # connection to database
         connection = sqlite3.connect('data.db')

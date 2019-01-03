@@ -5,6 +5,7 @@ from flask_jwt import JWT
 from security import authenticate, identity
 # gain access to the users resource
 from user import UserRegister
+from item import Item, ItemList
 
 app = Flask(__name__)
 app.secret_key = 'jose'
@@ -17,4 +18,5 @@ api.add_resource(ItemList, '/items')
 # call UserRegister + functions
 api.add_resource(UserRegister, '/register')
 
-app.run(port=5000, debug=True)
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)

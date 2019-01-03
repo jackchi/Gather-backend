@@ -4,6 +4,8 @@ from flask_restful import Resource, reqparse
 
 
 class User:
+    TABLE_NAME = 'users'
+
     def __init__(self, _id, username, password):
         self.id = _id
         self.username = username
@@ -17,7 +19,8 @@ class User:
         cursor = connection.cursor()
 
         # search through table for given username
-        query = "SELECT * FROM users WHERE username=?"
+        query = "SELECT * FROM {table} WHERE username=?".format(
+            table=cls.TABLE_NAME)
         # params must always be in form of a tupple--> use ending comma
         result = cursor.execute(query, (username,))
         row = result.fetchone()
@@ -35,7 +38,7 @@ class User:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        query = "SELECT * FROM users WHERE id=?"
+        query = "SELECT * FROM {table} WHERE id=?".format(table=cls.TABLE_NAME)
         result = cursor.execute(query, (_id,))
         row = result.fetchone()
         if row:
@@ -48,6 +51,7 @@ class User:
 
 
 class UserRegister(Resource):
+    TABLE_NAME = 'users'
 
     parser = reqparse.RequestParser()
     # create required name/pw fields
@@ -69,7 +73,8 @@ class UserRegister(Resource):
         cursor = connection.cursor()
 
         # insert values into table. 1st id must be NULL in order to auto-increment. "?"s == username argument, pw argument.
-        query = "INSERT INTO users VALUES (NULL, ?, ?)"
+        query = "INSERT INTO {table} VALUES (NULL, ?, ?)".format(
+            table=self.TABLE_NAME)
         # username/pw must be in tuple
         cursor.execute(query, (data['username'], data['password']))
 

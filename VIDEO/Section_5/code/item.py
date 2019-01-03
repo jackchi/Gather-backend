@@ -5,6 +5,7 @@ import sqlite3
 
 class Item(Resource):
     TABLE_NAME = 'items'
+
     parser = reqparse.RequestParser()
     parser.add_argument('price',
                         type=float,
@@ -24,7 +25,8 @@ class Item(Resource):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        query = "SELECT * FROM items WHERE name=?"
+        query = "SELECT * FROM {table} items WHERE name=?".format(
+            table=cls.TABLE_NAME)
         result = cursor.execute(query, (name,))
         row = result.fetchone()
         connection.close()
@@ -45,14 +47,15 @@ class Item(Resource):
         except:
             return {"message": "An error occurred inserting the item"}
 
-        return item, 201
+        return item
 
     @classmethod
     def insert(cls, item):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        query = "INSERT INTO items VALUES (?, ?)"
+        query = "INSERT INTO {table} items VALUES (?, ?)".format(
+            table=cls.TABLE_NAME)
         cursor.execute(query, (item['name'], item['price']))
 
         connection.commit()
@@ -62,7 +65,8 @@ class Item(Resource):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        query = "DELETE FROM items WHERE name=?"
+        query = "DELETE FROM {table} WHERE name=?".format(
+            table=self.TABLE_NAME)
         cursor.execute(query, (name,))
 
         connection.commit()
@@ -78,22 +82,23 @@ class Item(Resource):
 
         if item is None:
             try:
-                self.insert(updated_item)
+                Item.insert(updated_item)
             except:
                 return {"message": "An error occurred inserting the item"}, 500
         else:
             try:
-                self.update(updated_item)
+                Item.update(updated_item)
             except:
                 return {"message": "An error occurred updating the item"}, 500
-        return item
+        return updated_item
 
     @classmethod
     def update(cls, item):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        query = "UPDATE items SET price=? WHERE name=?"
+        query = "UPDATE {table} SET price=? WHERE name=?".format(
+            table=cls.TABLE_NAME)
         cursor.execute(query, (item['price'], item['name']))
 
         connection.commit()
@@ -101,11 +106,13 @@ class Item(Resource):
 
 
 class ItemList(Resource):
+    TABLE_NAME = 'items'
+
     def get(self):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        query = "SELECT * FROM items"
+        query = "SELECT * FROM {table}".format(table=self.TABLE_NAME)
         result = cursor.execute(query)
         items = []
         for row in result:

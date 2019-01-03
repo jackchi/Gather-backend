@@ -1,5 +1,5 @@
 import sqlite3
-connection = sqlite3.connect('/backend/VIDEO/Section_5/code/data.db')
+connection = sqlite3.connect('data.db')
 cursor = connection.cursor()
 
 

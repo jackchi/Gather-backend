@@ -8,6 +8,7 @@ from user import UserRegister
 from item import Item, ItemList
 
 app = Flask(__name__)
+app.config['PROPAGATE_EXCEPTIONS'] = True
 app.secret_key = 'jose'
 api = Api(app)
 

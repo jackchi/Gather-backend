@@ -13,7 +13,7 @@ class Item(Resource):
                         help="This field cannot be left blank!"
                         )
 
-    @jwt_required()
+    # @jwt_required()
     def get(self, name):
         item = self.find_by_name(name)
         if item:
@@ -25,14 +25,14 @@ class Item(Resource):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        query = "SELECT * FROM {table} items WHERE name=?".format(
+        query = "SELECT * FROM {table} WHERE name=?".format(
             table=cls.TABLE_NAME)
         result = cursor.execute(query, (name,))
         row = result.fetchone()
         connection.close()
 
         if row:
-            return {'item': {"name": row[0], "price": row[1]}}
+            return {'item': {'name': row[0], 'price': row[1]}}
 
     def post(self, name):
         if self.find_by_name(name):
@@ -43,7 +43,7 @@ class Item(Resource):
         item = {'name': name, 'price': data['price']}
 
         try:
-            self.insert(item)
+            Item.insert(item)
         except:
             return {"message": "An error occurred inserting the item"}
 
@@ -54,7 +54,7 @@ class Item(Resource):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
-        query = "INSERT INTO {table} items VALUES (?, ?)".format(
+        query = "INSERT INTO {table} VALUES (?, ?)".format(
             table=cls.TABLE_NAME)
         cursor.execute(query, (item['name'], item['price']))
 
@@ -76,10 +76,8 @@ class Item(Resource):
 
     def put(self, name):
         data = Item.parser.parse_args()
-
         item = self.find_by_name(name)
         updated_item = {'name': name, 'price': data['price']}
-
         if item is None:
             try:
                 Item.insert(updated_item)
@@ -89,6 +87,7 @@ class Item(Resource):
             try:
                 Item.update(updated_item)
             except:
+                raise
                 return {"message": "An error occurred updating the item"}, 500
         return updated_item
 

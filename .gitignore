@@ -1,0 +1,18 @@
+# Files to be ignored by Git source control
+
+# Mac System
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Visual Studios
+.vscode/*
